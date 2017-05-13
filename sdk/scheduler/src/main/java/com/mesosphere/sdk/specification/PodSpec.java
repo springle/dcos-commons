@@ -22,6 +22,9 @@ public interface PodSpec {
     @JsonProperty("count")
     Integer getCount();
 
+    @JsonProperty("role")
+    String getRole();
+
     @JsonProperty("image")
     Optional<String> getImage();
     

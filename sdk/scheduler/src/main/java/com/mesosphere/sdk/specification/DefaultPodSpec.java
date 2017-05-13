@@ -2,25 +2,20 @@ package com.mesosphere.sdk.specification;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
+import com.mesosphere.sdk.offer.Constants;
 import com.mesosphere.sdk.offer.evaluate.placement.PlacementRule;
 import com.mesosphere.sdk.specification.util.RLimit;
 import com.mesosphere.sdk.specification.validation.UniqueTaskName;
 import com.mesosphere.sdk.specification.validation.ValidationUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Default implementation of {@link PodSpec}.
@@ -33,6 +28,7 @@ public class DefaultPodSpec implements PodSpec {
     @NotNull
     @Min(0)
     private final Integer count;
+    private final String role;
     @Size(min = 1)
     private String image;
     @Valid
@@ -56,6 +52,7 @@ public class DefaultPodSpec implements PodSpec {
             @JsonProperty("type") String type,
             @JsonProperty("user") String user,
             @JsonProperty("count") Integer count,
+            @JsonProperty("role") String role,
             @JsonProperty("image") String image,
             @JsonProperty("networks") Collection<NetworkSpec> networks,
             @JsonProperty("rlimits") Collection<RLimit> rlimits,
@@ -66,6 +63,7 @@ public class DefaultPodSpec implements PodSpec {
         this.type = type;
         this.user = user;
         this.count = count;
+        this.role = role;
         this.image = image;
         this.networks = (networks != null) ? networks : Collections.emptyList();
         this.rlimits = (rlimits != null) ? rlimits : Collections.emptyList();
@@ -76,7 +74,7 @@ public class DefaultPodSpec implements PodSpec {
     }
 
     private DefaultPodSpec(Builder builder) {
-        this(builder.type, builder.user, builder.count,
+        this(builder.type, builder.user, builder.count, builder.role,
              builder.image, builder.networks, builder.rlimits,
              builder.uris, builder.tasks, builder.placementRule,
              builder.volumes);
@@ -92,6 +90,7 @@ public class DefaultPodSpec implements PodSpec {
         builder.type = copy.getType();
         builder.user = copy.getUser().isPresent() ? copy.getUser().get() : null;
         builder.count = copy.getCount();
+        builder.role = copy.getRole();
         builder.image = copy.getImage().isPresent() ? copy.getImage().get() : null;
         builder.networks = copy.getNetworks();
         builder.rlimits = copy.getRLimits();
@@ -116,6 +115,11 @@ public class DefaultPodSpec implements PodSpec {
     @Override
     public Integer getCount() {
         return count;
+    }
+
+    @Override
+    public String getRole() {
+        return role;
     }
 
     @Override
@@ -180,9 +184,11 @@ public class DefaultPodSpec implements PodSpec {
         private List<TaskSpec> tasks = new ArrayList<>();
         private PlacementRule placementRule;
         private Collection<VolumeSpec> volumes;
+        private String role;
 
         private Builder(Optional<String> executorUri) {
             this.executorUri = executorUri;
+            this.role = Constants.DEFAULT_MESOS_ROLE;
         }
 
         /**
@@ -215,6 +221,17 @@ public class DefaultPodSpec implements PodSpec {
          */
         public Builder count(Integer count) {
             this.count = count;
+            return this;
+        }
+
+        /**
+         * Sets the {@code role} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param role the {@code role} to set
+         * @return a reference to this Builder
+         */
+        public Builder role(String role) {
+            this.role = role;
             return this;
         }
 

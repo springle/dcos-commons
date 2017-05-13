@@ -27,7 +27,7 @@ public class ResourceUtils {
     public static final String VIP_HOST_TLD = "l4lb.thisdcos.directory";
 
     public static Resource getUnreservedResource(String name, Value value) {
-        return setResource(Resource.newBuilder().setRole("*"), name, value);
+        return setResource(Resource.newBuilder().setRole(Constants.DEFAULT_MESOS_ROLE), name, value);
     }
 
     public static Resource getDesiredResource(ResourceSpec resourceSpec) {
@@ -59,7 +59,7 @@ public class ResourceUtils {
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
         Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource("disk", diskValue));
-        resBuilder.setRole("*");
+        resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
         resBuilder.setDisk(getUnreservedMountVolumeDiskInfo(mountRoot));
 
         return resBuilder.build();
@@ -122,7 +122,7 @@ public class ResourceUtils {
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
         Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource("disk", diskValue));
-        resBuilder.setRole("*");
+        resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
         return resBuilder.build();
     }
 
@@ -178,7 +178,7 @@ public class ResourceUtils {
                 .setScalar(Value.Scalar.newBuilder().setValue(value))
                 .build();
         Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource(name, val));
-        resBuilder.setRole("*");
+        resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
 
         return resBuilder.build();
     }
@@ -214,7 +214,7 @@ public class ResourceUtils {
                 .setRanges(Value.Ranges.newBuilder().addAllRange(ranges))
                 .build();
         Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource(name, val));
-        resBuilder.setRole("*");
+        resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
 
         return resBuilder.build();
     }

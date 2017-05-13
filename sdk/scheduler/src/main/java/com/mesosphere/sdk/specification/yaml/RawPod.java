@@ -1,11 +1,10 @@
 package com.mesosphere.sdk.specification.yaml;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mesosphere.sdk.offer.Constants;
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 /**
  * Raw YAML pod.
@@ -25,11 +24,13 @@ public class RawPod implements RawContainerInfoProvider {
     private final WriteOnceLinkedHashMap<String, RawResourceSet> resourceSets;
     private final RawVolume volume;
     private final WriteOnceLinkedHashMap<String, RawVolume> volumes;
+    private final String role;
 
     private RawPod(
             @JsonProperty("resource-sets") WriteOnceLinkedHashMap<String, RawResourceSet> resourceSets,
             @JsonProperty("placement") String placement,
             @JsonProperty("count") Integer count,
+            @JsonProperty("role") String role,
             @JsonProperty("container") RawContainer container,
             @JsonProperty("image") String image,
             @JsonProperty("networks") WriteOnceLinkedHashMap<String, RawNetwork> networks,
@@ -53,6 +54,12 @@ public class RawPod implements RawContainerInfoProvider {
         this.resourceSets = resourceSets;
         this.volume = volume;
         this.volumes = volumes == null ? new WriteOnceLinkedHashMap<>() : volumes;
+
+        if (role == null) {
+            role = Constants.DEFAULT_MESOS_ROLE;
+        }
+
+        this.role = role;
     }
 
     public String getPlacement() {
@@ -61,6 +68,10 @@ public class RawPod implements RawContainerInfoProvider {
 
     public Integer getCount() {
         return count;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public RawContainer getContainer() {

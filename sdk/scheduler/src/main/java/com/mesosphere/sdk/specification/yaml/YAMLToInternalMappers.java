@@ -88,7 +88,6 @@ public class YAMLToInternalMappers {
                     fileReader,
                     entry.getKey(),
                     taskConfigRouter.getConfig(entry.getKey()),
-                    role,
                     principal,
                     schedulerFlags.getExecutorURI()));
 
@@ -153,7 +152,6 @@ public class YAMLToInternalMappers {
             YAMLServiceSpecFactory.FileReader fileReader,
             String podName,
             ConfigNamespace configNamespace,
-            String role,
             String principal,
             String executorUri) throws Exception {
         DefaultPodSpec.Builder builder = DefaultPodSpec.newBuilder(executorUri)
@@ -177,7 +175,7 @@ public class YAMLToInternalMappers {
                                 rawResourceSet.getPorts(),
                                 rawResourceSet.getVolume(),
                                 rawResourceSet.getVolumes(),
-                                role,
+                                rawPod.getRole(),
                                 principal);
                     })
                     .collect(Collectors.toList()));
@@ -185,10 +183,10 @@ public class YAMLToInternalMappers {
         if (rawPod.getVolume() != null || !rawPod.getVolumes().isEmpty()) {
             Collection<VolumeSpec> volumeSpecs = new ArrayList<>(rawPod.getVolume() == null ?
                     Collections.emptyList() :
-                    Arrays.asList(from(rawPod.getVolume(), role, principal)));
+                    Arrays.asList(from(rawPod.getVolume(), rawPod.getRole(), principal)));
 
             volumeSpecs.addAll(rawPod.getVolumes().values().stream()
-                    .map(v -> from(v, role, principal))
+                    .map(v -> from(v, rawPod.getRole(), principal))
                     .collect(Collectors.toList()));
 
             builder.volumes(volumeSpecs);
@@ -203,7 +201,7 @@ public class YAMLToInternalMappers {
                     entry.getKey(),
                     configNamespace,
                     resourceSets,
-                    role,
+                    rawPod.getRole(),
                     principal));
         }
         builder.tasks(taskSpecs);

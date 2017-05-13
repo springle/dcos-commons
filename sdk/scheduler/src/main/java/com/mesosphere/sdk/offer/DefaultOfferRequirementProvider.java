@@ -488,7 +488,7 @@ public class DefaultOfferRequirementProvider implements OfferRequirementProvider
         Collection<Protos.Resource> resources = new ArrayList<>();
 
         for (ResourceSpec resourceSpec : resourceSet.getResources()) {
-            resources.add(ResourceUtils.getExpectedResource(resourceSpec));
+            resources.add(ResourceUtils.getDesiredResource(resourceSpec));
         }
 
         for (VolumeSpec volumeSpec : resourceSet.getVolumes()) {

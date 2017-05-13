@@ -129,7 +129,7 @@ public class MesosResourcePool {
     private void releaseAtomicResource(MesosResource mesosResource) {
         Resource.Builder resBuilder = Resource.newBuilder(mesosResource.getResource());
         resBuilder.clearReservation();
-        resBuilder.setRole("*");
+        resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
 
         if (resBuilder.hasDisk()) {
             DiskInfo.Builder diskBuilder = DiskInfo.newBuilder(resBuilder.getDisk());
