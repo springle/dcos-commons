@@ -30,7 +30,7 @@ public class ReservationEvaluationStage implements OfferEvaluationStage {
 
     @Override
     public EvaluationOutcome evaluate(MesosResourcePool mesosResourcePool, PodInfoBuilder podInfoBuilder) {
-        Map<String, MesosResource> reservedResources = mesosResourcePool.getReservedPool();
+        Map<String, MesosResource> reservedResources = mesosResourcePool.getDynamicallyReservedPool();
         Collection<OfferRecommendation> recommendations = new ArrayList<>();
         for (Map.Entry<String, MesosResource> entry : reservedResources.entrySet()) {
             if (resourceIds.contains(entry.getKey())) {

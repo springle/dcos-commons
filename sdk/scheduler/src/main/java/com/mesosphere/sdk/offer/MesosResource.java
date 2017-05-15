@@ -51,15 +51,47 @@ public class MesosResource {
     }
 
     public boolean hasReservation() {
-        return resource.hasReservation();
+        return resource.getReservationsCount() > 0 || resource.hasReservation();
+    }
+
+    public boolean isUnreserved() {
+        if (resource.hasRole() && resource.getRole().equals(Constants.DEFAULT_MESOS_ROLE)) {
+            return true;
+        }
+
+        if (!resource.hasReservation() && resource.getReservationsCount() == 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isReserved() {
+        return !isUnreserved();
+    }
+
+    public String getRole() {
+        // Default to last element of reservations stack.
+        if (resource.getReservationsCount() > 0) {
+            int lastIndex = resource.getReservationsCount() - 1;
+            return resource.getReservations(lastIndex).getRole();
+        }
+
+        // Fall back to deprecated single reservation specified in resource element.
+        if (resource.hasReservation() && resource.getReservation().hasRole()) {
+            return resource.getReservation().getRole();
+        }
+
+        // Fall back to role specified at resource level
+        if (resource.hasRole()) {
+            return resource.getRole();
+        }
+
+        return Constants.DEFAULT_MESOS_ROLE;
     }
 
     public Value getValue() {
         return ValueUtils.getValue(resource);
-    }
-
-    public String getRole() {
-        return resource.getRole();
     }
 
     public String getPrincipal() {

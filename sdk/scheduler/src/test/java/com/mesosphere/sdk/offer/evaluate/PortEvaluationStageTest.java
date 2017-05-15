@@ -142,7 +142,7 @@ public class PortEvaluationStageTest {
         Assert.assertTrue(outcome.isPassing());
 
         Assert.assertEquals(0, outcome.getOfferRecommendations().size());
-        Assert.assertEquals(0, mesosResourcePool.getReservedPool().size());
+        Assert.assertEquals(0, mesosResourcePool.getDynamicallyReservedPool().size());
     }
 
     @Test
