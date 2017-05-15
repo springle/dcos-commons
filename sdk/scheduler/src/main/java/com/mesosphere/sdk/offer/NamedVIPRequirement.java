@@ -50,9 +50,10 @@ public class NamedVIPRequirement extends PortRequirement {
     }
 
     @Override
-    public OfferEvaluationStage getEvaluationStage(String taskName) {
+    public OfferEvaluationStage getEvaluationStage(String role, String taskName) {
         return new NamedVIPEvaluationStage(
                 getResource(),
+                role,
                 taskName,
                 getPortName(),
                 getPort(),

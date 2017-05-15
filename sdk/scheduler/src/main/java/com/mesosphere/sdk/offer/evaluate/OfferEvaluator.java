@@ -94,7 +94,7 @@ public class OfferEvaluator {
             // We don't want to re-reserve resources for an already-running executor.
             if (!executorRequirement.isRunningExecutor()) {
                 for (ResourceRequirement r : executorRequirement.getResourceRequirements()) {
-                    evaluationPipeline.add(r.getEvaluationStage(null));
+                    evaluationPipeline.add(r.getEvaluationStage(offerRequirement.getChildRole(), null));
                 }
             }
             evaluationPipeline.add(executorRequirement.getEvaluationStage());
@@ -105,7 +105,7 @@ public class OfferEvaluator {
         for (TaskRequirement taskRequirement : offerRequirement.getTaskRequirements()) {
             String taskName = taskRequirement.getTaskInfo().getName();
             for (ResourceRequirement r : taskRequirement.getResourceRequirements()) {
-                evaluationPipeline.add(r.getEvaluationStage(taskName));
+                evaluationPipeline.add(r.getEvaluationStage(offerRequirement.getChildRole(), taskName));
             }
 
             evaluationPipeline.add(taskRequirement.getEvaluationStage());

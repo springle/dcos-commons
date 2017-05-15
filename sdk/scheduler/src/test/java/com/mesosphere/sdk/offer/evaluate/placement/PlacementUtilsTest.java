@@ -48,13 +48,24 @@ public class PlacementUtilsTest {
         TaskInfo task = origTask;
 
         OfferRequirement offerReq = OfferRequirement.create(
-                TestConstants.TASK_TYPE, new SchedulerLabelReader(origTask).getIndex(), Arrays.asList(origTask));
+                TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
+                new SchedulerLabelReader(origTask).getIndex(),
+                Arrays.asList(origTask));
         assertTrue(PlacementUtils.areEquivalent(task, offerReq));
 
-        offerReq = OfferRequirement.create(TestConstants.TASK_TYPE + "b", 0, Arrays.asList(origTask));
+        offerReq = OfferRequirement.create(
+                TestConstants.TASK_TYPE + "b",
+                TestConstants.ROLE,
+                0,
+                Arrays.asList(origTask));
         assertFalse(PlacementUtils.areEquivalent(task, offerReq));
 
-        offerReq = OfferRequirement.create(TestConstants.TASK_TYPE, 0, Collections.emptyList());
+        offerReq = OfferRequirement.create(
+                TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
+                0,
+                Collections.emptyList());
         assertFalse(PlacementUtils.areEquivalent(task, offerReq));
 
 
@@ -63,25 +74,49 @@ public class PlacementUtilsTest {
                 .setTaskId(CommonIdUtils.toTaskId(TestConstants.TASK_NAME + "b"))
                 .build();
 
-        offerReq = OfferRequirement.create(TestConstants.TASK_TYPE, 0, Arrays.asList(origTask));
+        offerReq = OfferRequirement.create(
+                TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
+                0,
+                Arrays.asList(origTask));
         assertFalse(PlacementUtils.areEquivalent(task, offerReq));
 
-        offerReq = OfferRequirement.create(TestConstants.TASK_TYPE + "b", 0, Arrays.asList(origTask));
+        offerReq = OfferRequirement.create(
+                TestConstants.TASK_TYPE + "b",
+                TestConstants.ROLE,
+                0,
+                Arrays.asList(origTask));
         assertFalse(PlacementUtils.areEquivalent(task, offerReq));
 
-        offerReq = OfferRequirement.create(TestConstants.TASK_TYPE, 0, Collections.emptyList());
+        offerReq = OfferRequirement.create(
+                TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
+                0,
+                Collections.emptyList());
         assertFalse(PlacementUtils.areEquivalent(task, offerReq));
 
 
         task = origTask.toBuilder().clearLabels().build();
 
-        offerReq = OfferRequirement.create(TestConstants.TASK_TYPE, 0, Arrays.asList(origTask));
+        offerReq = OfferRequirement.create(
+                TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
+                0,
+                Arrays.asList(origTask));
         assertFalse(PlacementUtils.areEquivalent(task, offerReq));
 
-        offerReq = OfferRequirement.create(TestConstants.TASK_TYPE + "b", 0, Arrays.asList(origTask));
+        offerReq = OfferRequirement.create(
+                TestConstants.TASK_TYPE + "b",
+                TestConstants.ROLE,
+                0,
+                Arrays.asList(origTask));
         assertFalse(PlacementUtils.areEquivalent(task, offerReq));
 
-        offerReq = OfferRequirement.create(TestConstants.TASK_TYPE, 0, Collections.emptyList());
+        offerReq = OfferRequirement.create(
+                TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
+                0,
+                Collections.emptyList());
         assertFalse(PlacementUtils.areEquivalent(task, offerReq));
     }
 }

@@ -7,6 +7,8 @@ import org.apache.mesos.Protos.Resource;
 import org.apache.mesos.Protos.Resource.DiskInfo;
 import org.apache.mesos.Protos.Value;
 
+import java.util.Optional;
+
 /**
  * A {@link ResourceRequirement} encapsulates a needed {@link MesosResource}.
  *
@@ -41,7 +43,7 @@ public class ResourceRequirement {
         return mesosResource.getName();
     }
 
-    public String getResourceId() {
+    public Optional<String> getResourceId() {
         return mesosResource.getResourceId();
     }
 
@@ -50,13 +52,6 @@ public class ResourceRequirement {
      */
     public String getPersistenceId() {
         return hasPersistenceId() ? getDiskInfo().getPersistence().getId() : null;
-    }
-
-    /**
-     * Returns whether this requirement is able to be fulfilled without requiring a resource reservation.
-     */
-    public boolean consumesUnreservedResource() {
-        return !expectsResource() && !reservesResource();
     }
 
     /**
@@ -72,7 +67,7 @@ public class ResourceRequirement {
      * destination.
      */
     public boolean expectsResource() {
-        return hasResourceId() && !getResourceId().isEmpty();
+        return hasResourceId();
     }
 
     /**
@@ -107,8 +102,8 @@ public class ResourceRequirement {
         return mesosResource.getValue();
     }
 
-    public OfferEvaluationStage getEvaluationStage(String taskName) {
-        return new ResourceEvaluationStage(getResource(), taskName);
+    public OfferEvaluationStage getEvaluationStage(String role, String taskName) {
+        return new ResourceEvaluationStage(getResource(), role, taskName);
     }
 
     private boolean hasResourceId() {

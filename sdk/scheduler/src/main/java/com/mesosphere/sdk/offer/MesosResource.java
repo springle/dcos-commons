@@ -1,10 +1,16 @@
 package com.mesosphere.sdk.offer;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.mesos.Protos;
 import org.apache.mesos.Protos.Label;
 import org.apache.mesos.Protos.Resource;
 import org.apache.mesos.Protos.Resource.DiskInfo.Source;
 import org.apache.mesos.Protos.Value;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Wrapper around a Mesos {@link Resource}, combined with a resource ID string which should be present in the
@@ -17,7 +23,7 @@ public class MesosResource {
     public static final String VIP_LABEL_VALUE_KEY = "vip_value";
 
     private final Resource resource;
-    private final String resourceId;
+    private final Optional<String> resourceId;
 
     public MesosResource(Resource resource) {
         this.resource = resource;
@@ -43,10 +49,10 @@ public class MesosResource {
     }
 
     public boolean hasResourceId() {
-        return resourceId != null;
+        return resourceId.isPresent();
     }
 
-    public String getResourceId() {
+    public Optional<String> getResourceId() {
         return resourceId;
     }
 
@@ -107,14 +113,31 @@ public class MesosResource {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    private static String getResourceIdInternal(Resource resource) {
-        if (resource.hasReservation()) {
-            for (Label label : resource.getReservation().getLabels().getLabelsList()) {
-                if (label.getKey().equals(RESOURCE_ID_KEY)) {
-                    return label.getValue();
-                }
+    private static Optional<String> getResourceIdInternal(Resource resource) {
+        final List<Resource.ReservationInfo> reservationInfos = new ArrayList<>();
+        if (resource.hasReservation() && resource.getReservation().hasLabels()) {
+            reservationInfos.add(resource.getReservation());
+        }
+
+        for (Resource.ReservationInfo reservationInfo : resource.getReservationsList()) {
+            if (reservationInfo.hasLabels()) {
+                reservationInfos.add(reservationInfo);
             }
         }
-        return null;
+
+        List<Resource.ReservationInfo> reversedReservations = Lists.reverse(reservationInfos);
+        return reversedReservations.stream()
+                .map(reservationInfo -> getResourceIdInternal(reservationInfo.getLabels()))
+                .filter(resourceId -> resourceId.isPresent())
+                .map(resourceId -> resourceId.get())
+                .findFirst();
+    }
+
+    private static Optional<String> getResourceIdInternal(Protos.Labels labels) {
+        return labels.getLabelsList().stream()
+                .filter(label -> label.getKey().equals(RESOURCE_ID_KEY))
+                .map(label -> label.getValue())
+                .filter(id -> !id.isEmpty())
+                .findFirst();
     }
 }

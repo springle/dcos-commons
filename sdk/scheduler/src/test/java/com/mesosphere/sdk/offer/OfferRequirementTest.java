@@ -94,6 +94,7 @@ public class OfferRequirementTest {
         ExecutorInfo execInfo = TaskTestUtils.getExecutorInfo(cpu);
         OfferRequirement offerRequirement = OfferRequirement.create(
                 "taskType",
+                TestConstants.ROLE,
                 0,
                 Arrays.asList(new TaskRequirement(taskInfo)),
                 Optional.of(ExecutorRequirement.create(execInfo)));

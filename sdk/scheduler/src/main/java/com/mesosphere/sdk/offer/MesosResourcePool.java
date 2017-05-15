@@ -20,9 +20,8 @@ public class MesosResourcePool {
 
     private Offer offer;
     private Map<String, List<MesosResource>> unreservedAtomicPool;
-    private Map<String, Value> unreservedMergedPool;
     private Map<String, MesosResource> dynamicallyReservedPool;
-    private Map<String, List<MesosResource>> preReservedPool;
+    private Map<String, Map<String, Value>> reservableMergedPool;
 
     /**
      * Creates a new pool of resources based on what's available in the provided {@link Offer}.
@@ -35,9 +34,8 @@ public class MesosResourcePool {
         this.offer = offer;
         final Collection<MesosResource> mesosResources = getMesosResources(offer);
         this.unreservedAtomicPool = getUnreservedAtomicPool(mesosResources);
-        this.unreservedMergedPool = getUnreservedMergedPool(mesosResources);
         this.dynamicallyReservedPool = getDynamicallyReservedPool(mesosResources);
-        this.preReservedPool = getPreReservedPool(mesosResources);
+        this.reservableMergedPool = getReservableMergedPool(mesosResources);
     }
 
     /**
@@ -56,18 +54,22 @@ public class MesosResourcePool {
     }
 
     /**
-     * Returns the unreserved resources of which a subset can be consumed from an Offer. For
-     * example, an offer may contain 4.0 CPUs and 2.4 of those CPUs can be reserved.
-     */
-    public Map<String, Value> getUnreservedMergedPool() {
-        return unreservedMergedPool;
-    }
-
-    /**
-     * Returns the resources which are reserved.
+     * Returns the resources which were dynamically reserved.
      */
     public Map<String, MesosResource> getDynamicallyReservedPool() {
         return dynamicallyReservedPool;
+    }
+
+    /**
+     * Returns the resources which are reservable.  These may have been pre-reserved (dynamically or statically) or
+     * never reserved.
+     */
+    public Map<String, Map<String, Value>> getReservableMergedPool() {
+        return reservableMergedPool;
+    }
+
+    public Map<String, Value> getUnreservedMergedPool() {
+        return reservableMergedPool.get(Constants.DEFAULT_MESOS_ROLE);
     }
 
     /**
@@ -87,8 +89,8 @@ public class MesosResourcePool {
             return consumeReserved(resourceRequirement);
         } else if (resourceRequirement.isAtomic()) {
             return consumeAtomic(resourceRequirement);
-        } else if (resourceRequirement.reservesResource() || resourceRequirement.consumesUnreservedResource()) {
-            return consumeUnreservedMerged(resourceRequirement);
+        } else if (resourceRequirement.reservesResource()) {
+            return consumeReservableMerged(resourceRequirement);
         }
 
         logger.error("The following resource requirement did not meet any consumption criteria: {}",
@@ -102,30 +104,6 @@ public class MesosResourcePool {
      */
     public void update(Offer offer) {
         init(offer);
-    }
-
-    /**
-     * Marks the provided resource as available for consumption.
-     */
-    public void release(MesosResource mesosResource) {
-        if (mesosResource.isAtomic()) {
-            releaseAtomicResource(mesosResource);
-            return;
-        } else {
-            releaseMergedResource(mesosResource);
-            return;
-        }
-    }
-
-    private void releaseMergedResource(MesosResource mesosResource) {
-        Value currValue = unreservedMergedPool.get(mesosResource.getName());
-
-        if (currValue == null) {
-            currValue = ValueUtils.getZero(mesosResource.getType());
-        }
-
-        Value updatedValue = ValueUtils.add(currValue, mesosResource.getValue());
-        unreservedMergedPool.put(mesosResource.getName(), updatedValue);
     }
 
     private void releaseAtomicResource(MesosResource mesosResource) {
@@ -152,7 +130,7 @@ public class MesosResourcePool {
     }
 
     private Optional<MesosResource> consumeReserved(ResourceRequirement resourceRequirement) {
-        MesosResource mesosResource = dynamicallyReservedPool.get(resourceRequirement.getResourceId());
+        MesosResource mesosResource = dynamicallyReservedPool.get(resourceRequirement.getResourceId().get());
 
         if (mesosResource != null) {
             if (mesosResource.isAtomic()) {
@@ -167,16 +145,18 @@ public class MesosResourcePool {
                 }
             } else {
                 Value desiredValue = resourceRequirement.getValue();
-                Value availableValue = dynamicallyReservedPool.get(resourceRequirement.getResourceId()).getValue();
+                Value availableValue = mesosResource.getValue();
                 if (ValueUtils.compare(availableValue, desiredValue) > 0) {
                     // update the value in pool with the remaining unclaimed resource amount
                     Resource remaining = ResourceUtils.setValue(
                             mesosResource.getResource(), ValueUtils.subtract(availableValue, desiredValue));
-                    dynamicallyReservedPool.put(resourceRequirement.getResourceId(), new MesosResource(remaining));
+                    dynamicallyReservedPool.put(
+                            resourceRequirement.getResourceId().get(),
+                            new MesosResource(remaining));
                     // return only the claimed resource amount from this reservation
                     mesosResource = new MesosResource(resourceRequirement.getResource());
                 } else {
-                    dynamicallyReservedPool.remove(resourceRequirement.getResourceId());
+                    dynamicallyReservedPool.remove(resourceRequirement.getResourceId().get());
                 }
             }
         } else {
@@ -226,13 +206,23 @@ public class MesosResourcePool {
         return sufficientResource;
     }
 
-    private Optional<MesosResource> consumeUnreservedMerged(ResourceRequirement resourceRequirement) {
+    private Optional<MesosResource> consumeReservableMerged(ResourceRequirement resourceRequirement) {
         Value desiredValue = resourceRequirement.getValue();
-        Value availableValue = unreservedMergedPool.get(resourceRequirement.getName());
+        Map<String, Value> pool = reservableMergedPool.get(resourceRequirement.getRole());
+        if (pool == null) {
+            logger.info("No unreserved resources available in role: {}", resourceRequirement.getRole());
+            return Optional.empty();
+        }
+
+        Value availableValue = pool.get(resourceRequirement.getName());
 
         if (sufficientValue(desiredValue, availableValue)) {
-            unreservedMergedPool.put(resourceRequirement.getName(), ValueUtils.subtract(availableValue, desiredValue));
-            Resource resource = ResourceUtils.getUnreservedResource(resourceRequirement.getName(), desiredValue);
+            pool.put(resourceRequirement.getName(), ValueUtils.subtract(availableValue, desiredValue));
+            reservableMergedPool.put(resourceRequirement.getRole(), pool);
+            Resource resource = ResourceUtils.getUnreservedResource(
+                    resourceRequirement.getName(),
+                    desiredValue,
+                    resourceRequirement.getRole());
             return Optional.of(new MesosResource(resource));
         } else {
             if (availableValue == null) {
@@ -274,29 +264,34 @@ public class MesosResourcePool {
 
         for (MesosResource mesResource : mesosResources) {
             if (mesResource.hasResourceId()) {
-                reservedPool.put(mesResource.getResourceId(), mesResource);
+                reservedPool.put(mesResource.getResourceId().get(), mesResource);
             }
         }
 
         return reservedPool;
     }
 
-    private Map<String, List<MesosResource>> getPreReservedPool(Collection<MesosResource> mesosResources) {
-        Map<String, List<MesosResource>> pool = new HashMap<>();
+    private Map<String, Map<String, Value>> getReservableMergedPool(Collection<MesosResource> mesosResources) {
+        Map<String, List<MesosResource>> rolePool = new HashMap<>();
         for (MesosResource mesosResource : getMergedResources(mesosResources)) {
-            if (!mesosResource.hasResourceId() && !mesosResource.getRole().equals(Constants.DEFAULT_MESOS_ROLE)) {
+            if (!mesosResource.hasResourceId()) {
                 String role = mesosResource.getRole();
-                List<MesosResource> resources = pool.get(role);
+                List<MesosResource> resources = rolePool.get(role);
                 if (resources == null) {
                     resources = new ArrayList<>();
                 }
 
                 resources.add(mesosResource);
-                pool.put(role, resources);
+                rolePool.put(role, resources);
             }
         }
 
-        return pool;
+        Map<String, Map<String, Value>> roleResourcePool = new HashMap<>();
+        for (Map.Entry<String, List<MesosResource>> entry : rolePool.entrySet()) {
+            roleResourcePool.put(entry.getKey(), getResourcePool(entry.getValue()));
+        }
+
+        return roleResourcePool;
     }
 
     private static Map<String, List<MesosResource>> getUnreservedAtomicPool(
@@ -318,11 +313,9 @@ public class MesosResourcePool {
         return pool;
     }
 
-    private static Map<String, Value> getUnreservedMergedPool(
-            Collection<MesosResource> mesosResources) {
-        Map<String, Value> pool = new HashMap<String, Value>();
-
-        for (MesosResource mesosResource : getUnreservedMergedResources(mesosResources)) {
+    private static Map<String, Value> getResourcePool(Collection<MesosResource> mesosResources) {
+        Map<String, Value> pool = new HashMap<>();
+        for (MesosResource mesosResource : mesosResources) {
             String name = mesosResource.getName();
             Value currValue = pool.get(name);
 
@@ -372,8 +365,7 @@ public class MesosResourcePool {
         return atomicResources;
     }
 
-    private static Collection<MesosResource> getMergedResources(
-            Collection<MesosResource> mesosResources) {
+    private static Collection<MesosResource> getMergedResources(Collection<MesosResource> mesosResources) {
         Collection<MesosResource> mergedResources = new ArrayList<>();
 
         for (MesosResource mesosResource : mesosResources) {

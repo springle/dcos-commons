@@ -1,5 +1,6 @@
 package com.mesosphere.sdk.offer.evaluate;
 
+import com.mesosphere.sdk.config.ConfigStore;
 import com.mesosphere.sdk.offer.*;
 import com.mesosphere.sdk.offer.evaluate.placement.PlacementUtils;
 import com.mesosphere.sdk.offer.taskdata.EnvUtils;
@@ -22,6 +23,7 @@ import com.mesosphere.sdk.testutils.OfferRequirementTestUtils;
 import com.mesosphere.sdk.testutils.OfferTestUtils;
 import com.mesosphere.sdk.testutils.ResourceTestUtils;
 import com.mesosphere.sdk.testutils.TestConstants;
+import com.sun.tools.internal.jxc.ap.Const;
 import org.apache.mesos.Protos;
 import org.apache.mesos.Protos.*;
 import org.apache.mesos.Protos.Offer.Operation;
@@ -498,8 +500,10 @@ public class OfferEvaluatorTest extends OfferEvaluatorTestBase {
 
         Assert.assertEquals(Operation.Type.RESERVE, reserveOperation.getType());
         Assert.assertEquals(1500, reserveResource.getScalar().getValue(), 0.0);
-        Assert.assertEquals(TestConstants.ROLE, reserveResource.getRole());
-        Assert.assertEquals(TestConstants.PRINCIPAL, reserveResource.getReservation().getPrincipal());
+        Assert.assertEquals(Constants.DEFAULT_MESOS_ROLE, reserveResource.getRole());
+        Assert.assertEquals(1, reserveResource.getReservationsCount());
+        Assert.assertEquals(TestConstants.ROLE, reserveResource.getReservations(0).getRole());
+        Assert.assertEquals(TestConstants.PRINCIPAL, reserveResource.getReservations(0).getPrincipal());
         Assert.assertEquals(MesosResource.RESOURCE_ID_KEY, getFirstLabel(reserveResource).getKey());
         Assert.assertEquals(36, getFirstLabel(reserveResource).getValue().length());
 
@@ -596,10 +600,12 @@ public class OfferEvaluatorTest extends OfferEvaluatorTestBase {
 
         Assert.assertEquals(Operation.Type.LAUNCH, launchOperation.getType());
         Assert.assertEquals(1000, launchResource.getScalar().getValue(), 0.0);
-        Assert.assertEquals(TestConstants.ROLE, launchResource.getRole());
+        Assert.assertEquals(Constants.DEFAULT_MESOS_ROLE, launchResource.getRole());
+        Assert.assertEquals(1, launchResource.getReservationsCount());
+        Assert.assertEquals(TestConstants.ROLE, launchResource.getReservations(0).getRole());
         Assert.assertEquals(TestConstants.PERSISTENCE_ID, launchResource.getDisk().getPersistence().getId());
         Assert.assertEquals(TestConstants.PRINCIPAL, launchResource.getDisk().getPersistence().getPrincipal());
-        Assert.assertEquals(TestConstants.PRINCIPAL, launchResource.getReservation().getPrincipal());
+        Assert.assertEquals(TestConstants.PRINCIPAL, launchResource.getReservations(0).getPrincipal());
         Assert.assertEquals(MesosResource.RESOURCE_ID_KEY, getFirstLabel(launchResource).getKey());
         Assert.assertEquals(resourceId, getFirstLabel(launchResource).getValue());
     }
@@ -629,9 +635,11 @@ public class OfferEvaluatorTest extends OfferEvaluatorTestBase {
 
         Assert.assertEquals(Operation.Type.RESERVE, reserveOperation.getType());
         Assert.assertEquals(2000, reserveResource.getScalar().getValue(), 0.0);
-        Assert.assertEquals(TestConstants.ROLE, reserveResource.getRole());
+        Assert.assertEquals(Constants.DEFAULT_MESOS_ROLE, reserveResource.getRole());
+        Assert.assertEquals(1, reserveResource.getReservationsCount());
+        Assert.assertEquals(TestConstants.ROLE, reserveResource.getReservations(0).getRole());
         Assert.assertEquals(TestConstants.MOUNT_ROOT, reserveResource.getDisk().getSource().getMount().getRoot());
-        Assert.assertEquals(TestConstants.PRINCIPAL, reserveResource.getReservation().getPrincipal());
+        Assert.assertEquals(TestConstants.PRINCIPAL, reserveResource.getReservations(0).getPrincipal());
         Assert.assertEquals(MesosResource.RESOURCE_ID_KEY, getFirstLabel(reserveResource).getKey());
         Assert.assertEquals(36, getFirstLabel(reserveResource).getValue().length());
 
@@ -703,7 +711,9 @@ public class OfferEvaluatorTest extends OfferEvaluatorTestBase {
 
         Assert.assertEquals(Operation.Type.RESERVE, reserveOperation.getType());
         Assert.assertEquals(1.0, reserveResource.getScalar().getValue(), 0.0);
-        Assert.assertEquals(TestConstants.ROLE, reserveResource.getRole());
+        Assert.assertEquals(Constants.DEFAULT_MESOS_ROLE, reserveResource.getRole());
+        Assert.assertEquals(1, reserveResource.getReservationsCount());
+        Assert.assertEquals(TestConstants.ROLE, reserveResource.getReservations(0).getRole());
         Assert.assertEquals(TestConstants.PRINCIPAL, reserveResource.getReservation().getPrincipal());
         Assert.assertEquals(MesosResource.RESOURCE_ID_KEY, getFirstLabel(reserveResource).getKey());
         Assert.assertEquals(36, getFirstLabel(reserveResource).getValue().length());
@@ -851,8 +861,10 @@ public class OfferEvaluatorTest extends OfferEvaluatorTestBase {
 
         Assert.assertEquals(Operation.Type.UNRESERVE, unreserveOperation.getType());
         Assert.assertEquals(1.0, unreserveResource.getScalar().getValue(), 0.0);
-        Assert.assertEquals(TestConstants.ROLE, unreserveResource.getRole());
-        Assert.assertEquals(TestConstants.PRINCIPAL, unreserveResource.getReservation().getPrincipal());
+        Assert.assertEquals(Constants.DEFAULT_MESOS_ROLE, unreserveResource.getRole());
+        Assert.assertEquals(1, unreserveResource.getReservationsCount());
+        Assert.assertEquals(TestConstants.ROLE, unreserveResource.getReservations(0).getRole());
+        Assert.assertEquals(TestConstants.PRINCIPAL, unreserveResource.getReservations(0).getPrincipal());
         Assert.assertEquals(MesosResource.RESOURCE_ID_KEY, getFirstLabel(unreserveResource).getKey());
         Assert.assertEquals(resourceId, getFirstLabel(unreserveResource).getValue());
 
@@ -1015,7 +1027,7 @@ public class OfferEvaluatorTest extends OfferEvaluatorTestBase {
                 PodInstanceRequirement.newBuilder(podInstance, Arrays.asList("node")).build())
                 .getTaskRequirements().stream()
                 .flatMap(taskRequirement -> taskRequirement.getResourceRequirements().stream())
-                .map(resourceRequirement -> resourceRequirement.getResourceId())
+                .map(resourceRequirement -> resourceRequirement.getResourceId().get())
                 .collect(Collectors.toList());
         Assert.assertEquals(resourceIds.toString(), 2, resourceIds.size());
 

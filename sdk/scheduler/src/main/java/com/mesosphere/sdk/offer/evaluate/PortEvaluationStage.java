@@ -3,18 +3,18 @@ package com.mesosphere.sdk.offer.evaluate;
 import com.mesosphere.sdk.offer.*;
 import com.mesosphere.sdk.offer.taskdata.EnvConstants;
 import com.mesosphere.sdk.offer.taskdata.SchedulerLabelWriter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.mesos.Protos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-import static com.mesosphere.sdk.offer.evaluate.EvaluationOutcome.*;
+import static com.mesosphere.sdk.offer.evaluate.EvaluationOutcome.fail;
 
 /**
  * This class evaluates an offer for a single port against an {@link OfferRequirement}, finding a port dynamically
@@ -32,8 +32,8 @@ public class PortEvaluationStage extends ResourceEvaluationStage implements Offe
     private String resourceId;
 
     public PortEvaluationStage(
-            Protos.Resource resource, String taskName, String portName, int port, Optional<String> customEnvKey) {
-        super(resource, taskName);
+            Protos.Resource resource, String role, String taskName, String portName, int port, Optional<String> customEnvKey) {
+        super(resource, role, taskName);
         this.portName = portName;
         this.port = port;
         this.customEnvKey = customEnvKey;
@@ -114,16 +114,15 @@ public class PortEvaluationStage extends ResourceEvaluationStage implements Offe
         ResourceUtils.mergeRanges(resourceBuilder, resource);
     }
 
-    @Override
     protected Protos.Resource getFulfilledResource(Protos.Resource resource) {
-        Protos.Resource reservedResource = super.getFulfilledResource(resource);
+        Protos.Resource reservedResource = super.getFulfilledResource(resource, role);
         if (!StringUtils.isBlank(resourceId)) {
             reservedResource = ResourceUtils.setResourceId(ResourceUtils.clearResourceId(reservedResource), resourceId);
         }
         return reservedResource;
     }
 
-    private static Optional<Integer> selectDynamicPort(
+    private Optional<Integer> selectDynamicPort(
             MesosResourcePool mesosResourcePool, PodInfoBuilder podInfoBuilder) {
         // We don't want to dynamically consume a port that's explicitly claimed by this pod accidentally, so
         // compile a list of those to check against the offered ports.
@@ -148,7 +147,12 @@ public class PortEvaluationStage extends ResourceEvaluationStage implements Offe
             }
         }
 
-        Protos.Value availablePorts = mesosResourcePool.getUnreservedMergedPool().get(Constants.PORTS_RESOURCE_TYPE);
+        Protos.Value availablePorts = null;
+        Map<String, Protos.Value> rolePool = mesosResourcePool.getReservableMergedPool().get(role);
+        if (rolePool != null) {
+            availablePorts = rolePool.get(Constants.PORTS_RESOURCE_TYPE);
+        }
+
         Optional<Integer> dynamicPort = Optional.empty();
         if (availablePorts != null) {
             dynamicPort = availablePorts.getRanges().getRangeList().stream()

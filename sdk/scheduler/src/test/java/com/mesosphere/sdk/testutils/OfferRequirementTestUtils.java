@@ -53,6 +53,7 @@ public class OfferRequirementTestUtils {
 
         return new OfferRequirement(
                 TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
                 0,
                 Arrays.asList(taskRequirement),
                 Optional.of(executorRequirement),
@@ -94,6 +95,7 @@ public class OfferRequirementTestUtils {
 
         return new OfferRequirement(
                 TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
                 0,
                 taskRequirements,
                 Optional.empty(),

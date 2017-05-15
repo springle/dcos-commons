@@ -31,6 +31,7 @@ public class ExecutorEvaluationStageTest {
 
         OfferRequirement offerRequirement = OfferRequirement.create(
                 TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
                 0,
                 Arrays.asList(new TaskRequirement(taskInfo)),
                 Optional.of(ExecutorRequirement.create(execInfo)));
@@ -55,6 +56,7 @@ public class ExecutorEvaluationStageTest {
 
         OfferRequirement offerRequirement = OfferRequirement.create(
                 TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
                 0,
                 Arrays.asList(new TaskRequirement(taskInfo)),
                 Optional.of(ExecutorRequirement.create(execInfo)));

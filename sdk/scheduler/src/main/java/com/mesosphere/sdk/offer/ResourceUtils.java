@@ -26,8 +26,12 @@ public class ResourceUtils {
     public static final String VIP_PREFIX = "VIP_";
     public static final String VIP_HOST_TLD = "l4lb.thisdcos.directory";
 
+    public static Resource getUnreservedResource(String name, Value value, String role) {
+        return setResource(Resource.newBuilder().setRole(role), name, value);
+    }
+
     public static Resource getUnreservedResource(String name, Value value) {
-        return setResource(Resource.newBuilder().setRole(Constants.DEFAULT_MESOS_ROLE), name, value);
+        return getUnreservedResource(name, value, Constants.DEFAULT_MESOS_ROLE);
     }
 
     public static Resource getDesiredResource(ResourceSpec resourceSpec) {
@@ -92,7 +96,7 @@ public class ResourceUtils {
         Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource("disk", diskValue));
         resBuilder.setRole(role);
         resBuilder.setDisk(getExpectedMountVolumeDiskInfo(mountRoot, containerPath, persistenceId, principal));
-        resBuilder.setReservation(getExpectedReservationInfo(resourceId, principal));
+        resBuilder.setReservation(getExpectedReservationInfo(resourceId, role, principal));
 
         return resBuilder.build();
     }
@@ -150,9 +154,8 @@ public class ResourceUtils {
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
         Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource("disk", diskValue));
-        resBuilder.setRole(role);
         resBuilder.setDisk(getExpectedRootVolumeDiskInfo(persistenceId, containerPath, principal));
-        resBuilder.setReservation(getExpectedReservationInfo(resourceId, principal));
+        resBuilder.addReservations(getExpectedReservationInfo(resourceId, role, principal));
 
         return resBuilder.build();
     }
@@ -194,8 +197,7 @@ public class ResourceUtils {
                 .setScalar(Value.Scalar.newBuilder().setValue(value))
                 .build();
         Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource(name, val));
-        resBuilder.setRole(role);
-        resBuilder.setReservation(getExpectedReservationInfo(resourceId, principal));
+        resBuilder.addReservations(getExpectedReservationInfo(resourceId, role, principal));
 
         return resBuilder.build();
     }
@@ -244,8 +246,7 @@ public class ResourceUtils {
                 .setRanges(Value.Ranges.newBuilder().addAllRange(ranges))
                 .build();
         Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource(name, val));
-        resBuilder.setRole(role);
-        resBuilder.setReservation(getExpectedReservationInfo(resourceId, principal));
+        resBuilder.addReservations(getExpectedReservationInfo(resourceId, role, principal));
 
         return resBuilder.build();
     }
@@ -738,8 +739,9 @@ public class ResourceUtils {
                 .build();
     }
 
-    private static ReservationInfo getExpectedReservationInfo(String resourceId, String principal) {
+    private static ReservationInfo getExpectedReservationInfo(String resourceId, String role, String principal) {
         return ReservationInfo.newBuilder()
+                .setRole(role)
                 .setPrincipal(principal)
                 .setLabels(Labels.newBuilder()
                         .addLabels(Label.newBuilder()

@@ -1,5 +1,6 @@
 package com.mesosphere.sdk.testutils;
 
+import com.mesosphere.sdk.offer.Constants;
 import org.apache.mesos.Protos;
 import org.apache.mesos.Protos.Resource;
 import com.mesosphere.sdk.offer.ResourceUtils;
@@ -9,7 +10,7 @@ import java.util.Arrays;
 public class ResourceTestUtils {
     public static Resource getDesiredRootVolume(double diskSize) {
         return ResourceUtils.getDesiredRootVolume(
-                TestConstants.ROLE,
+                Constants.DEFAULT_MESOS_ROLE,
                 TestConstants.PRINCIPAL,
                 diskSize,
                 TestConstants.CONTAINER_PATH);
@@ -58,7 +59,15 @@ public class ResourceTestUtils {
 
     public static Resource getDesiredScalar(String name, double value) {
         return ResourceUtils.getDesiredScalar(
-                TestConstants.ROLE,
+                Constants.DEFAULT_MESOS_ROLE,
+                TestConstants.PRINCIPAL,
+                name,
+                value);
+    }
+
+    public static Resource getDesiredScalar(String name, double value, String preReservedRole) {
+        return ResourceUtils.getDesiredScalar(
+                preReservedRole,
                 TestConstants.PRINCIPAL,
                 name,
                 value);
@@ -84,7 +93,7 @@ public class ResourceTestUtils {
 
     public static final Resource getDesiredRanges(String name, long begin, long end) {
         return ResourceUtils.getDesiredRanges(
-                TestConstants.ROLE,
+                Constants.DEFAULT_MESOS_ROLE,
                 TestConstants.PRINCIPAL,
                 name,
                 Arrays.asList(Protos.Value.Range.newBuilder().setBegin(begin).setEnd(end).build()));
@@ -117,6 +126,10 @@ public class ResourceTestUtils {
 
     public static Resource getDesiredCpu(double cpus) {
         return ResourceTestUtils.getDesiredScalar("cpus", cpus);
+    }
+
+    public static Resource getDesiredCpu(double cpus, String preReservedrole) {
+        return ResourceTestUtils.getDesiredScalar("cpus", cpus, preReservedrole);
     }
 
     public static Resource getDesiredMem(double mem) {

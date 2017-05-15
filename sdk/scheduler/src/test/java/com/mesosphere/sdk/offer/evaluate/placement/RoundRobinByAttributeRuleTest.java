@@ -29,7 +29,11 @@ public class RoundRobinByAttributeRuleTest {
 
     @BeforeClass
     public static void beforeAll() throws InvalidRequirementException {
-        REQ = OfferRequirement.create(TestConstants.TASK_TYPE, 0, Collections.emptyList());
+        REQ = OfferRequirement.create(
+                TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
+                0,
+                Collections.emptyList());
     }
 
     private static final String ATTRIB_NAME = "rack_id";
@@ -52,6 +56,7 @@ public class RoundRobinByAttributeRuleTest {
         TaskInfo taskInfo1 = getTaskInfo("1", "value1");
         OfferRequirement req1 = OfferRequirement.create(
                 TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
                 new SchedulerLabelReader(taskInfo1).getIndex(),
                 Arrays.asList(taskInfo1));
         tasks.add(taskInfo1); // value1:1
@@ -63,6 +68,7 @@ public class RoundRobinByAttributeRuleTest {
         TaskInfo taskInfo2 = getTaskInfo("2", "value3");
         OfferRequirement req2 = OfferRequirement.create(
                 TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
                 new SchedulerLabelReader(taskInfo2).getIndex(),
                 Arrays.asList(taskInfo2));
         tasks.add(taskInfo2); // value1:1, value3:1
@@ -121,6 +127,7 @@ public class RoundRobinByAttributeRuleTest {
         TaskInfo taskInfo1 = getTaskInfo("1", "value1");
         OfferRequirement req1 = OfferRequirement.create(
                 TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
                 new SchedulerLabelReader(taskInfo1).getIndex(),
                 Arrays.asList(taskInfo1));
         tasks.add(taskInfo1); // value1:1
@@ -131,6 +138,7 @@ public class RoundRobinByAttributeRuleTest {
         TaskInfo taskInfo2 = getTaskInfo("2", "value3");
         OfferRequirement req2 = OfferRequirement.create(
                 TestConstants.TASK_TYPE,
+                TestConstants.ROLE,
                 new SchedulerLabelReader(taskInfo2).getIndex(),
                 Arrays.asList(taskInfo2));
         tasks.add(taskInfo2); // value1:1, value3:1

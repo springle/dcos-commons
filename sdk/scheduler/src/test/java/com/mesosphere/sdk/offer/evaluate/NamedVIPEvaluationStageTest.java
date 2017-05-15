@@ -28,6 +28,7 @@ public class NamedVIPEvaluationStageTest {
 
         PortEvaluationStage portEvaluationStage = new NamedVIPEvaluationStage(
                 desiredPorts,
+                TestConstants.ROLE,
                 TestConstants.TASK_NAME,
                 "test-port",
                 10000,
@@ -67,6 +68,7 @@ public class NamedVIPEvaluationStageTest {
 
         PortEvaluationStage portEvaluationStage = new NamedVIPEvaluationStage(
                 expectedPorts,
+                TestConstants.ROLE,
                 TestConstants.TASK_NAME,
                 "test-port",
                 10000,
@@ -109,6 +111,7 @@ public class NamedVIPEvaluationStageTest {
 
         PortEvaluationStage portEvaluationStage = new NamedVIPEvaluationStage(
                 desiredPorts,
+                TestConstants.ROLE,
                 TestConstants.TASK_NAME,
                 "test-port",
                 8000,

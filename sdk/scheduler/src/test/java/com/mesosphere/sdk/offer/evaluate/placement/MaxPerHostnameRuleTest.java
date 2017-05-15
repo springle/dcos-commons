@@ -3,6 +3,7 @@ package com.mesosphere.sdk.offer.evaluate.placement;
 import com.mesosphere.sdk.offer.CommonIdUtils;
 import com.mesosphere.sdk.testutils.OfferRequirementTestUtils;
 import com.mesosphere.sdk.testutils.OfferTestUtils;
+import com.mesosphere.sdk.testutils.TestConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -361,7 +362,11 @@ public class MaxPerHostnameRuleTest {
     private static OfferRequirement getOfferReq(TaskInfo taskInfo) {
         try {
             SchedulerLabelReader labels = new SchedulerLabelReader(taskInfo);
-            return OfferRequirement.create(labels.getType(), labels.getIndex(), Arrays.asList(taskInfo));
+            return OfferRequirement.create(
+                    labels.getType(),
+                    TestConstants.ROLE,
+                    labels.getIndex(),
+                    Arrays.asList(taskInfo));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

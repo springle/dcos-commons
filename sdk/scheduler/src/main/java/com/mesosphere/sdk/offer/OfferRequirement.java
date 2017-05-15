@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
  */
 public class OfferRequirement {
     private final String type;
+    private final String childRole;
     private final Map<String, TaskRequirement> taskRequirements;
     private final Optional<ExecutorRequirement> executorRequirementOptional;
     private final Optional<PlacementRule> placementRuleOptional;
@@ -44,12 +45,14 @@ public class OfferRequirement {
      */
     public static OfferRequirement create(
             String taskType,
+            String childRole,
             int index,
             Collection<TaskInfo> taskInfos,
             Optional<ExecutorInfo> executorInfoOptional,
             Optional<PlacementRule> placementRuleOptional) throws InvalidRequirementException {
         return new OfferRequirement(
                 taskType,
+                childRole,
                 index,
                 getTaskRequirementsInternal(taskInfos, taskType, index),
                 executorInfoOptional.isPresent() ?
@@ -60,12 +63,18 @@ public class OfferRequirement {
 
     public static OfferRequirement create(
             String taskType,
+            String childRole,
             int index,
             Collection<TaskRequirement> taskRequirements,
             ExecutorRequirement executorRequirement,
             Optional<PlacementRule> placementRuleOptional) {
         return new OfferRequirement(
-                taskType, index, taskRequirements, Optional.ofNullable(executorRequirement), placementRuleOptional);
+                taskType,
+                childRole,
+                index,
+                taskRequirements,
+                Optional.ofNullable(executorRequirement),
+                placementRuleOptional);
     }
 
     /**
@@ -73,17 +82,24 @@ public class OfferRequirement {
      *
      * @see #OfferRequirement(String, int, Collection, Optional, Optional)
      */
-    public static OfferRequirement create(String taskType, int index, Collection<TaskInfo> taskInfos)
+    public static OfferRequirement create(String taskType, String childRole, int index, Collection<TaskInfo> taskInfos)
             throws InvalidRequirementException {
-        return create(taskType, index, taskInfos, Optional.empty(), Optional.empty());
+        return create(taskType, childRole, index, taskInfos, Optional.empty(), Optional.empty());
     }
 
     public static OfferRequirement create(
             String taskType,
+            String childRole,
             int index,
             Collection<TaskRequirement> taskRequirements,
             Optional<ExecutorRequirement> executorRequirement) throws InvalidRequirementException {
-        return new OfferRequirement(taskType, index, taskRequirements, executorRequirement, Optional.empty());
+        return new OfferRequirement(
+                taskType,
+                childRole,
+                index,
+                taskRequirements,
+                executorRequirement,
+                Optional.empty());
     }
 
     /**
@@ -91,16 +107,18 @@ public class OfferRequirement {
      */
     public OfferRequirement withoutPlacementRules() {
         return new OfferRequirement(
-                type, index, taskRequirements.values(), executorRequirementOptional, Optional.empty());
+                type, childRole, index, taskRequirements.values(), executorRequirementOptional, Optional.empty());
     }
 
     public OfferRequirement(
             String type,
+            String childRole,
             int index,
             Collection<TaskRequirement> taskRequirements,
             Optional<ExecutorRequirement> executorRequirementOptional,
             Optional<PlacementRule> placementRuleOptional) {
         this.type = type;
+        this.childRole = childRole;
         this.index = index;
         this.taskRequirements = taskRequirements.stream()
                 .collect(Collectors.toMap(t -> t.getTaskInfo().getName(), Function.identity()));
@@ -110,6 +128,10 @@ public class OfferRequirement {
 
     public String getType() {
         return type;
+    }
+
+    public String getChildRole() {
+        return childRole;
     }
 
     public int getIndex() {

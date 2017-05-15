@@ -35,7 +35,7 @@ public class PortRequirement extends ResourceRequirement {
     }
 
     @Override
-    public OfferEvaluationStage getEvaluationStage(String taskName) {
-        return new PortEvaluationStage(getResource(), taskName, getPortName(), getPort(), getCustomEnvKey());
+    public OfferEvaluationStage getEvaluationStage(String role, String taskName) {
+        return new PortEvaluationStage(getResource(), role, taskName, getPortName(), getPort(), getCustomEnvKey());
     }
 }

@@ -27,7 +27,6 @@ public class ResourceRequirementTest {
         ResourceRequirement resReq = new ResourceRequirement(res);
 
         Assert.assertNull(resReq.getResourceId());
-        Assert.assertTrue(resReq.consumesUnreservedResource());
         Assert.assertFalse(resReq.expectsResource());
         Assert.assertFalse(resReq.reservesResource());
     }
@@ -38,10 +37,9 @@ public class ResourceRequirementTest {
         logger.info("Resource: {}", res);
         ResourceRequirement resReq = new ResourceRequirement(res);
 
-        Assert.assertFalse(resReq.consumesUnreservedResource());
         Assert.assertTrue(resReq.reservesResource());
         Assert.assertFalse(resReq.expectsResource());
-        Assert.assertTrue(resReq.getResourceId().isEmpty());
+        Assert.assertFalse(resReq.getResourceId().isPresent());
     }
 
     @Test
@@ -50,7 +48,6 @@ public class ResourceRequirementTest {
         logger.info("Resource: {}", res);
         ResourceRequirement resReq = new ResourceRequirement(res);
 
-        Assert.assertFalse(resReq.consumesUnreservedResource());
         Assert.assertFalse(resReq.reservesResource());
         Assert.assertTrue(resReq.expectsResource());
         Assert.assertNotNull(resReq.getResourceId());
@@ -62,7 +59,6 @@ public class ResourceRequirementTest {
         logger.info("Resource: {}", res);
         ResourceRequirement resReq = new ResourceRequirement(res);
 
-        Assert.assertFalse(resReq.consumesUnreservedResource());
         Assert.assertFalse(resReq.expectsVolume());
         Assert.assertTrue(resReq.createsVolume());
     }
@@ -73,7 +69,6 @@ public class ResourceRequirementTest {
         logger.info("Resource: {}", res);
         ResourceRequirement resReq = new ResourceRequirement(res);
 
-        Assert.assertFalse(resReq.consumesUnreservedResource());
         Assert.assertTrue(resReq.expectsVolume());
         Assert.assertFalse(resReq.createsVolume());
     }

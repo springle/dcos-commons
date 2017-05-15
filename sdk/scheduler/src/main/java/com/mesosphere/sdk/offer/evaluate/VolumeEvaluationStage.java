@@ -23,12 +23,12 @@ import static com.mesosphere.sdk.offer.evaluate.EvaluationOutcome.*;
 public class VolumeEvaluationStage extends ResourceEvaluationStage implements OfferEvaluationStage {
     private static final Logger logger = LoggerFactory.getLogger(VolumeEvaluationStage.class);
 
-    public VolumeEvaluationStage(Resource resource, String taskName) {
-        super(resource, taskName);
+    public VolumeEvaluationStage(Resource resource, String role, String taskName) {
+        super(resource, role, taskName);
     }
 
-    public VolumeEvaluationStage(Resource resource) {
-        super(resource);
+    public VolumeEvaluationStage(Resource resource, String role) {
+        this(resource, role, null);
     }
 
     @Override
@@ -72,9 +72,8 @@ public class VolumeEvaluationStage extends ResourceEvaluationStage implements Of
                 resourceRequirement.getResource().getDisk().getVolume().getContainerPath());
     }
 
-    @Override
     protected Resource getFulfilledResource(Resource resource) {
-        Resource.Builder builder = super.getFulfilledResource(resource).toBuilder();
+        Resource.Builder builder = super.getFulfilledResource(resource, role).toBuilder();
         Optional<DiskInfo> diskInfo = getFulfilledDiskInfo(resource);
         if (diskInfo.isPresent()) {
             builder.setDisk(diskInfo.get());

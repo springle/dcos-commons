@@ -56,6 +56,7 @@ public class DefaultOfferRequirementProvider implements OfferRequirementProvider
         PodInstance podInstance = podInstanceRequirement.getPodInstance();
         return OfferRequirement.create(
                 podInstance.getPod().getType(),
+                podInstance.getPod().getRole(),
                 podInstance.getIndex(),
                 getNewTaskRequirements(
                         podInstance,
@@ -249,6 +250,7 @@ public class DefaultOfferRequirementProvider implements OfferRequirementProvider
 
         return OfferRequirement.create(
                 podInstance.getPod().getType(),
+                podInstance.getPod().getRole(),
                 podInstance.getIndex(),
                 taskRequirements,
                 ExecutorRequirement.create(getExecutor(podInstance, serviceName, targetConfigurationId)),

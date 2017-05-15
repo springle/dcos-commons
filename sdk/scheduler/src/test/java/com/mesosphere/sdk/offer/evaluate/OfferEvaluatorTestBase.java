@@ -46,6 +46,6 @@ public class OfferEvaluatorTestBase {
     }
 
     protected static Label getFirstLabel(Resource resource) {
-        return resource.getReservation().getLabels().getLabels(0);
+        return resource.getReservations(0).getLabels().getLabels(0);
     }
 }

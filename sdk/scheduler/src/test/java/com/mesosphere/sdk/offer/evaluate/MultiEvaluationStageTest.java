@@ -33,6 +33,7 @@ public class MultiEvaluationStageTest {
             Optional<String> envKey = (i % 2 == 0) ? Optional.empty() : Optional.of(TestConstants.PORT_ENV_NAME + i);
             evaluationStages.add(new PortEvaluationStage(
                     desiredPort,
+                    TestConstants.ROLE,
                     TestConstants.TASK_NAME,
                     "test-port" + i,
                     (int) desiredValue.getBegin(),

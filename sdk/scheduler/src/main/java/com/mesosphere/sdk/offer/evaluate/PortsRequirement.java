@@ -27,9 +27,9 @@ public class PortsRequirement extends ResourceRequirement {
     }
 
     @Override
-    public OfferEvaluationStage getEvaluationStage(String taskName) {
+    public OfferEvaluationStage getEvaluationStage(String role, String taskName) {
         return new MultiEvaluationStage(
-                portRequirements.stream().map(r -> r.getEvaluationStage(taskName)).collect(Collectors.toList()));
+                portRequirements.stream().map(r -> r.getEvaluationStage(role, taskName)).collect(Collectors.toList()));
     }
 
     private static Protos.Resource coalescePorts(List<Protos.Resource> resources) {

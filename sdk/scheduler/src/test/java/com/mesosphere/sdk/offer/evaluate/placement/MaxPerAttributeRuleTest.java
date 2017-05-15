@@ -2,6 +2,7 @@ package com.mesosphere.sdk.offer.evaluate.placement;
 
 import com.mesosphere.sdk.testutils.OfferRequirementTestUtils;
 import com.mesosphere.sdk.testutils.OfferTestUtils;
+import com.mesosphere.sdk.testutils.TestConstants;
 import org.apache.mesos.Protos.Attribute;
 import org.apache.mesos.Protos.Offer;
 import org.apache.mesos.Protos.TaskInfo;
@@ -487,7 +488,11 @@ public class MaxPerAttributeRuleTest {
     private static OfferRequirement getOfferReq(TaskInfo taskInfo) {
         try {
             SchedulerLabelReader labels = new SchedulerLabelReader(taskInfo);
-            return OfferRequirement.create(labels.getType(), labels.getIndex(), Arrays.asList(taskInfo));
+            return OfferRequirement.create(
+                    labels.getType(),
+                    TestConstants.ROLE,
+                    labels.getIndex(),
+                    Arrays.asList(taskInfo));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

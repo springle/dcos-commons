@@ -22,7 +22,7 @@ public class ResourceEvaluationStageTest {
         OfferRequirement offerRequirement = OfferRequirementTestUtils.getOfferRequirement(desiredResource);
 
         ResourceEvaluationStage resourceEvaluationStage =
-                new ResourceEvaluationStage(desiredResource, TestConstants.TASK_NAME);
+                new ResourceEvaluationStage(desiredResource, TestConstants.ROLE, TestConstants.TASK_NAME);
         EvaluationOutcome outcome =
                 resourceEvaluationStage.evaluate(mesosResourcePool, new PodInfoBuilder(offerRequirement));
         Assert.assertTrue(outcome.isPassing());
@@ -52,7 +52,7 @@ public class ResourceEvaluationStageTest {
         OfferRequirement offerRequirement = OfferRequirementTestUtils.getOfferRequirement(expectedResource);
 
         ResourceEvaluationStage resourceEvaluationStage =
-                new ResourceEvaluationStage(expectedResource, TestConstants.TASK_NAME);
+                new ResourceEvaluationStage(expectedResource, TestConstants.ROLE, TestConstants.TASK_NAME);
         EvaluationOutcome outcome =
                 resourceEvaluationStage.evaluate(mesosResourcePool, new PodInfoBuilder(offerRequirement));
         Assert.assertTrue(outcome.isPassing());
@@ -80,7 +80,9 @@ public class ResourceEvaluationStageTest {
         OfferRequirement offerRequirement = OfferRequirementTestUtils.getOfferRequirement(desiredResource);
 
         ResourceEvaluationStage resourceEvaluationStage = new ResourceEvaluationStage(
-                desiredResource, TestConstants.TASK_NAME);
+                desiredResource,
+                TestConstants.ROLE,
+                TestConstants.TASK_NAME);
         EvaluationOutcome outcome =
                 resourceEvaluationStage.evaluate(mesosResourcePool, new PodInfoBuilder(offerRequirement));
         Assert.assertFalse(outcome.isPassing());
