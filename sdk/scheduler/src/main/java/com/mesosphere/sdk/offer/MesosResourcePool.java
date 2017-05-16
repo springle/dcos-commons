@@ -219,7 +219,7 @@ public class MesosResourcePool {
         if (sufficientValue(desiredValue, availableValue)) {
             pool.put(resourceRequirement.getName(), ValueUtils.subtract(availableValue, desiredValue));
             reservableMergedPool.put(resourceRequirement.getRole(), pool);
-            Resource resource = ResourceUtils.getUnreservedResource(
+            Resource resource = ResourceUtils.getStaticResource(
                     resourceRequirement.getName(),
                     desiredValue,
                     resourceRequirement.getRole());

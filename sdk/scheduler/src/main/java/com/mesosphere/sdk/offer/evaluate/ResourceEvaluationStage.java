@@ -103,7 +103,7 @@ public class ResourceEvaluationStage implements OfferEvaluationStage {
                             resourceRequirement.getName(),
                             TextFormat.shortDebugString(existingResource.getValue()),
                             TextFormat.shortDebugString(resourceRequirement.getValue()));
-                    Resource reserveResource = ResourceUtils.getExpectedResource(
+                    Resource reserveResource = ResourceUtils.getDesiredResource(
                             resourceRequirement.getRole(),
                             resourceRequirement.getPrincipal(),
                             resourceRequirement.getName(),

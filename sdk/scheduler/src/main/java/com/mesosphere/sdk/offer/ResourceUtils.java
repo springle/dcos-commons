@@ -26,12 +26,12 @@ public class ResourceUtils {
     public static final String VIP_PREFIX = "VIP_";
     public static final String VIP_HOST_TLD = "l4lb.thisdcos.directory";
 
-    public static Resource getUnreservedResource(String name, Value value, String role) {
-        return setResource(Resource.newBuilder().setRole(role), name, value);
+    public static Resource getStaticResource(String name, Value value) {
+        return getStaticResource(name, value, Constants.DEFAULT_MESOS_ROLE);
     }
 
-    public static Resource getUnreservedResource(String name, Value value) {
-        return getUnreservedResource(name, value, Constants.DEFAULT_MESOS_ROLE);
+    public static Resource getStaticResource(String name, Value value, String role) {
+        return setValue(Resource.newBuilder().setRole(role), name, value);
     }
 
     public static Resource getDesiredResource(ResourceSpec resourceSpec) {
@@ -43,14 +43,11 @@ public class ResourceUtils {
     }
 
     public static Resource getDesiredResource(String role, String principal, String name, Value value) {
-        return Resource.newBuilder(getUnreservedResource(name, value))
-                .setRole(role)
-                .setReservation(getDesiredReservationInfo(principal))
-                .build();
+        return getResourceWithId(role, principal, name, value, "");
     }
 
     public static Resource getExpectedResource(ResourceSpec resourceSpec) {
-        return getExpectedResource(
+        return getDesiredResource(
                 resourceSpec.getRole(),
                 resourceSpec.getPrincipal(),
                 resourceSpec.getName(),
@@ -62,7 +59,7 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource("disk", diskValue));
+        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getStaticResource("disk", diskValue));
         resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
         resBuilder.setDisk(getUnreservedMountVolumeDiskInfo(mountRoot));
 
@@ -74,7 +71,7 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(getUnreservedResource("disk", diskValue));
+        Resource.Builder resBuilder = Resource.newBuilder(getStaticResource("disk", diskValue));
         resBuilder.setRole(role);
         resBuilder.setReservation(getDesiredReservationInfo(principal));
         resBuilder.setDisk(getDesiredMountVolumeDiskInfo(principal, containerPath));
@@ -93,7 +90,7 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource("disk", diskValue));
+        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getStaticResource("disk", diskValue));
         resBuilder.setRole(role);
         resBuilder.setDisk(getExpectedMountVolumeDiskInfo(mountRoot, containerPath, persistenceId, principal));
         resBuilder.setReservation(getExpectedReservationInfo(resourceId, role, principal));
@@ -125,7 +122,7 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource("disk", diskValue));
+        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getStaticResource("disk", diskValue));
         resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
         return resBuilder.build();
     }
@@ -135,7 +132,7 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(getUnreservedResource("disk", diskValue));
+        Resource.Builder resBuilder = Resource.newBuilder(getStaticResource("disk", diskValue));
         resBuilder.setRole(role);
         resBuilder.setReservation(getDesiredReservationInfo(principal));
         resBuilder.setDisk(getDesiredRootVolumeDiskInfo(principal, containerPath));
@@ -153,23 +150,20 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(diskSize))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource("disk", diskValue));
+        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getStaticResource("disk", diskValue));
         resBuilder.setDisk(getExpectedRootVolumeDiskInfo(persistenceId, containerPath, principal));
         resBuilder.addReservations(getExpectedReservationInfo(resourceId, role, principal));
 
         return resBuilder.build();
     }
 
-    public static Resource getExpectedResource(String role, String principal, String name, Value value) {
-        return getExpectedResource(role, principal, name, value, "");
-    }
-
-    public static Resource getExpectedResource(String role,
-                                               String principal,
-                                               String name,
-                                               Value value,
-                                               String resourceId) {
-        return Resource.newBuilder(getUnreservedResource(name, value))
+    public static Resource getResourceWithId(
+            String role,
+            String principal,
+            String name,
+            Value value,
+            String resourceId) {
+        return Resource.newBuilder(getStaticResource(name, value))
                 .setRole(role)
                 .setReservation(getDesiredReservationInfo(principal, resourceId))
                 .build();
@@ -180,7 +174,7 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(value))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource(name, val));
+        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getStaticResource(name, val));
         resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
 
         return resBuilder.build();
@@ -196,7 +190,7 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(value))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource(name, val));
+        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getStaticResource(name, val));
         resBuilder.addReservations(getExpectedReservationInfo(resourceId, role, principal));
 
         return resBuilder.build();
@@ -207,7 +201,7 @@ public class ResourceUtils {
                 .setType(Value.Type.SCALAR)
                 .setScalar(Value.Scalar.newBuilder().setValue(value))
                 .build();
-        return getExpectedResource(role, principal, name, val);
+        return getDesiredResource(role, principal, name, val);
     }
 
     public static Resource getUnreservedRanges(String name, List<Range> ranges) {
@@ -215,14 +209,14 @@ public class ResourceUtils {
                 .setType(Value.Type.RANGES)
                 .setRanges(Value.Ranges.newBuilder().addAllRange(ranges))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource(name, val));
+        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getStaticResource(name, val));
         resBuilder.setRole(Constants.DEFAULT_MESOS_ROLE);
 
         return resBuilder.build();
     }
 
     public static Resource getDesiredRanges(String role, String principal, String name, List<Range> ranges) {
-        return getExpectedResource(
+        return getDesiredResource(
                 role,
                 principal,
                 name,
@@ -245,7 +239,7 @@ public class ResourceUtils {
                 .setType(Value.Type.RANGES)
                 .setRanges(Value.Ranges.newBuilder().addAllRange(ranges))
                 .build();
-        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getUnreservedResource(name, val));
+        Resource.Builder resBuilder = Resource.newBuilder(ResourceUtils.getStaticResource(name, val));
         resBuilder.addReservations(getExpectedReservationInfo(resourceId, role, principal));
 
         return resBuilder.build();
@@ -357,7 +351,7 @@ public class ResourceUtils {
     }
 
     public static Resource setValue(Resource resource, Value value) {
-        return setResource(Resource.newBuilder(resource), resource.getName(), value);
+        return setValue(Resource.newBuilder(resource), resource.getName(), value);
     }
 
     public static Resource setResourceId(Resource resource, String resourceId) {
@@ -680,12 +674,9 @@ public class ResourceUtils {
         }
     }
 
-    private static Resource setResource(Resource.Builder resBuilder, String name, Value value) {
+    private static Resource setValue(Resource.Builder resBuilder, String name, Value value) {
         Value.Type type = value.getType();
-
-        resBuilder
-                .setName(name)
-                .setType(type);
+        resBuilder.setName(name).setType(type);
 
         switch (type) {
             case SCALAR:
