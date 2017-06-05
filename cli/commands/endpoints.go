@@ -7,8 +7,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-// Endpoints section
-
 type EndpointsHandler struct {
 	Name                  string
 	PrintDeprecatedNotice bool

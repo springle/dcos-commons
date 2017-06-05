@@ -7,8 +7,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-// Pods section
-
 type PodsHandler struct {
 	PodName string
 }

@@ -7,8 +7,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-// State section
-
 type StateHandler struct {
 	PropertyName string
 }

@@ -12,8 +12,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-// Plan section
-
 type PlanHandler struct {
 	PlanName   string
 	Parameters []string
@@ -186,7 +184,7 @@ func toStatusTree(planName string, planJsonBytes []byte) string {
 	phases, ok := optionsJSON["phases"].([]interface{})
 	if ok {
 		for i, rawPhase := range phases {
-			appendPhase(&buf, rawPhase, i == len(phases) - 1)
+			appendPhase(&buf, rawPhase, i == len(phases)-1)
 		}
 	}
 
@@ -223,7 +221,7 @@ func appendPhase(buf *bytes.Buffer, rawPhase interface{}, lastPhase bool) {
 		return
 	}
 	for i, rawStep := range steps {
-		appendStep(buf, rawStep, lastPhase, i == len(steps) - 1)
+		appendStep(buf, rawStep, lastPhase, i == len(steps)-1)
 	}
 }
 
