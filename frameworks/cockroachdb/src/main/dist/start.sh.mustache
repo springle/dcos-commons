@@ -1,0 +1,26 @@
+#!/bin/bash
+
+echo "---------------------------"
+echo "STARTING COCKROACHDB SERVER"
+echo "---------------------------"
+
+if $MESOS_SANDBOX/cockroach-latest.linux-amd64/cockroach node ls \
+    --insecure \
+    --host="internal.cockroachdb.l4lb.thisdcos.directory" \
+    >/dev/null 2>/dev/null
+then
+    echo "Looks like there's already at least one other CockroachDB node running, connecting new node to the cluster..."
+    $MESOS_SANDBOX/cockroach-latest.linux-amd64/cockroach start \
+        --insecure \
+        --store=$TASK_NAME \
+        --http-port=$PORT_GUI \
+        --port=$PORT_INTERNAL \
+        --join="internal.cockroachdb.l4lb.thisdcos.directory:26257"
+else
+    echo "Looks like there are no CockroachDB nodes running, starting first node..."
+    $MESOS_SANDBOX/cockroach-latest.linux-amd64/cockroach start \
+        --insecure \
+        --store=$TASK_NAME \
+        --http-port=$PORT_GUI \
+        --port=$PORT_INTERNAL
+fi

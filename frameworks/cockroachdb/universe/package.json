@@ -1,0 +1,13 @@
+{
+  "packagingVersion": "2.0",
+  "minDcosReleaseVersion": "1.9",
+  "name": "cockroachdb",
+  "version": "{{package-version}}",
+  "maintainer": "springle@mesosphere.com",
+  "description": "CockroachDB on DC/OS",
+  "selected": false,
+  "framework": true,
+  "tags": ["cockroachdb"],
+  "postInstallNotes": "CockroachDB is being installed!\n\n\tDocumentation: https://www.cockroachlabs.com/docs\n\tIssues: contact springle@mesosphere.com",
+  "postUninstallNotes": "CockroachDB has been uninstalled."
+}
