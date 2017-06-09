@@ -5,7 +5,7 @@ scheduler:
   user: {{FRAMEWORK_USER}}
 pods:
   cockroachdb:
-    count: 3
+    count: {{NODE_COUNT}}
     uris:
       - "https://binaries.cockroachdb.com/cockroach-latest.linux-amd64.tgz"
       - {{BOOTSTRAP_URI}}

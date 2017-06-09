@@ -49,13 +49,13 @@
             "title": "Node count",
             "description": "Number of Template pods to run",
             "type": "integer",
-            "default":1
+            "default":2
           },
           "placement_constraint": {
             "title": "Placement constraint",
             "description": "Marathon-style placement constraint for nodes. Example: 'hostname:UNIQUE'",
             "type": "string",
-            "default": ""
+            "default": "hostname:UNIQUE"
           },
           "cpus": {
             "title": "CPU count",
