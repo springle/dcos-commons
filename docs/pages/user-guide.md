@@ -2,6 +2,17 @@
 
 The following are instructions for creating a new Mesos framework / DCOS package using dcos-commons.
 
+## Getting Started
+
+The best way to get familiar with the dcos-commons SDK is to just start using it. Here are a few recommended first-steps for newcommers:
+
+1. Do the [Quick Start](https://github.com/mesosphere/dcos-commons/blob/master/README.md#quick-start) on the dcos-commons GitHub page.
+2. Read through the [Developer Guide](https://mesosphere.github.io/dcos-commons/developer-guide.html). It's okay if you don't understand everything on the first read, this is meant to be a reference.
+3. Go through the [Kafka Tutorial](https://mesosphere.github.io/dcos-commons/tutorials/kafka-tutorial.html). This tutorial takes you through the process of actually creating a simple, new framework using the SDK.
+4. Bookmark the [YAML Reference](https://mesosphere.github.io/dcos-commons/yaml-reference.html).
+
+After going through these steps, you should have a basic understanding of the SDK. You're now ready to create a framework for your own service.
+
 ## Creating a New Framework
 
 These steps will help you get a template framework built, installed, and running on your DCOS cluster. Once you have your framework running, you can customize it as necessary.
