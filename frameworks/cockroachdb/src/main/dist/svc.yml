@@ -1,5 +1,5 @@
 name: {{FRAMEWORK_NAME}}
-web-url: "http://gui.cockroachdb.l4lb.thisdcos.directory"
+web-url: "http://gui.cockroachdb.l4lb.thisdcos.directory" # This isn't working :(
 scheduler:
   principal: {{FRAMEWORK_PRINCIPAL}}
   user: {{FRAMEWORK_USER}}
@@ -32,7 +32,7 @@ pods:
               prefix: internal
               port: 26257
         volume:
-          path: "cockroachdb-container-path"
+          path: "test-cockroach-data"
           type: {{NODE_DISK_TYPE}}
           size: {{NODE_DISK}}
         readiness-check:
