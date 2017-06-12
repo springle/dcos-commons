@@ -28,6 +28,12 @@
             "type": "string",
             "default": ""
           },
+          "version": {
+            "title": "Service Version",
+            "description": "Service version",
+            "type": "string",
+            "default": "v1.0.1"
+          },
           "secret_name": {
             "title": "Credential secret name (optional)",
             "description": "Name of the Secret Store credentials to use for DC/OS service authentication. This should be left empty unless service authentication is needed.",
@@ -38,7 +44,7 @@
         "required":[
           "name",
           "sleep",
-          "user"
+          "user",
         ]
       },
       "node": {

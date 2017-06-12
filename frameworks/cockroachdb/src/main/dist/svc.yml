@@ -7,7 +7,7 @@ pods:
   cockroachdb:
     count: {{NODE_COUNT}}
     uris:
-      - "https://binaries.cockroachdb.com/cockroach-{{COCKROACH_VERSION}}.linux-amd64.tgz"
+      - "https://binaries.cockroachdb.com/cockroach-{{FRAMEWORK_VERSION}}.tgz"
       - {{BOOTSTRAP_URI}}
     placement: {{NODE_PLACEMENT}}
     tasks:
@@ -36,12 +36,12 @@ pods:
           type: {{NODE_DISK_TYPE}}
           size: {{NODE_DISK}}
         readiness-check:
-          cmd: "$MESOS_SANDBOX/cockroach-{{COCKROACH_VERSION}}.linux-amd64/cockroach node ls --insecure --port=$PORT_INTERNAL >/dev/null 2>/dev/null"
+          cmd: "$MESOS_SANDBOX/cockroach-{{FRAMEWORK_VERSION}}/cockroach node ls --insecure --port=$PORT_INTERNAL >/dev/null 2>/dev/null"
           interval: 10
           delay: 5
           timeout: 300
         health-check:
-          cmd: "$MESOS_SANDBOX/cockroach-{{COCKROACH_VERSION}}.linux-amd64/cockroach node ls --insecure --port=$PORT_INTERNAL >/dev/null 2>/dev/null"
+          cmd: "$MESOS_SANDBOX/cockroach-{{FRAMEWORK_VERSION}}/cockroach node ls --insecure --port=$PORT_INTERNAL >/dev/null 2>/dev/null"
           interval: 120
           grace-period: 30
           max-consecutive-failures: 3

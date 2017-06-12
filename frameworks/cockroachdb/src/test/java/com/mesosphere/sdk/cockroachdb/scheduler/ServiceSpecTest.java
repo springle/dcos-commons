@@ -14,7 +14,7 @@ public class ServiceSpecTest extends BaseServiceSpecTest {
         ENV_VARS.set("LIBMESOS_URI", "");
         ENV_VARS.set("PORT_API", "8080");
         ENV_VARS.set("FRAMEWORK_NAME", "cockroachdb");
-        ENV_VARS.set("COCKROACH_VERSION", "v1.0.1");
+        ENV_VARS.set("FRAMEWORK_VERSION", "v1.0.1");
 
         ENV_VARS.set("NODE_COUNT", "2");
         ENV_VARS.set("NODE_CPUS", "0.1");
