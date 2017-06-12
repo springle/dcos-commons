@@ -14,6 +14,7 @@ public class ServiceSpecTest extends BaseServiceSpecTest {
         ENV_VARS.set("LIBMESOS_URI", "");
         ENV_VARS.set("PORT_API", "8080");
         ENV_VARS.set("FRAMEWORK_NAME", "cockroachdb");
+        ENV_VARS.set("COCKROACH_VERSION", "v1.0.1");
 
         ENV_VARS.set("NODE_COUNT", "2");
         ENV_VARS.set("NODE_CPUS", "0.1");
@@ -22,7 +23,7 @@ public class ServiceSpecTest extends BaseServiceSpecTest {
         ENV_VARS.set("NODE_DISK_TYPE", "ROOT");
 
         ENV_VARS.set("SLEEP_DURATION", "1000");
-        
+
         URL resource = ServiceSpecTest.class.getClassLoader().getResource("start.sh.mustache");
         ENV_VARS.set("CONFIG_TEMPLATE_PATH", new File(resource.getPath()).getParent());
     }

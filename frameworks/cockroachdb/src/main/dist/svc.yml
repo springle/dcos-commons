@@ -1,5 +1,5 @@
 name: {{FRAMEWORK_NAME}}
-web-url: "http://gui.cockroachdb.l4lb.thisdcos.directory"
+web-url: "http://gui.cockroachdb.l4lb.thisdcos.directory" # This isn't working :(
 scheduler:
   principal: {{FRAMEWORK_PRINCIPAL}}
   user: {{FRAMEWORK_USER}}
@@ -7,7 +7,7 @@ pods:
   cockroachdb:
     count: {{NODE_COUNT}}
     uris:
-      - "https://binaries.cockroachdb.com/cockroach-latest.linux-amd64.tgz"
+      - "https://binaries.cockroachdb.com/cockroach-{{COCKROACH_VERSION}}.linux-amd64.tgz"
       - {{BOOTSTRAP_URI}}
     placement: {{NODE_PLACEMENT}}
     tasks:
@@ -18,7 +18,7 @@ pods:
         configs:
           start:
             template: "{{CONFIG_TEMPLATE_PATH}}/start.sh.mustache"
-            dest: "start.sh" 
+            dest: "start.sh"
         cmd: "./bootstrap && chmod +x $MESOS_SANDBOX/start.sh && $MESOS_SANDBOX/start.sh"
         ports:
           gui:
@@ -32,17 +32,17 @@ pods:
               prefix: internal
               port: 26257
         volume:
-          path: "cockroachdb-container-path"
+          path: "test-cockroach-data"
           type: {{NODE_DISK_TYPE}}
           size: {{NODE_DISK}}
         readiness-check:
-          cmd: "$MESOS_SANDBOX/cockroach-latest.linux-amd64/cockroach node ls --insecure --port=$PORT_INTERNAL >/dev/null 2>/dev/null"
-          interval: 5
+          cmd: "$MESOS_SANDBOX/cockroach-{{COCKROACH_VERSION}}.linux-amd64/cockroach node ls --insecure --port=$PORT_INTERNAL >/dev/null 2>/dev/null"
+          interval: 10
           delay: 5
-          timeout: 100
+          timeout: 300
         health-check:
-          cmd: "$MESOS_SANDBOX/cockroach-latest.linux-amd64/cockroach node ls --insecure --port=$PORT_INTERNAL >/dev/null 2>/dev/null"
-          interval: 15
+          cmd: "$MESOS_SANDBOX/cockroach-{{COCKROACH_VERSION}}.linux-amd64/cockroach node ls --insecure --port=$PORT_INTERNAL >/dev/null 2>/dev/null"
+          interval: 120
           grace-period: 30
           max-consecutive-failures: 3
           timeout: 10
@@ -52,5 +52,5 @@ plans:
     strategy: serial
     phases:
       host:
-        strategy: serial 
+        strategy: serial
         pod: cockroachdb
